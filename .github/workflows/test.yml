@@ -1,0 +1,39 @@
+name: Playwright CI/CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v3
+
+    - name: 🐳 Build Docker image
+      run: |
+        docker build -t my-playwright-tests .
+
+    - name: 📦 Save image as tarball
+      run: |
+        docker save my-playwright-tests -o image.tar
+
+    - name: 🔐 Setup SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+    - name: 📤 Upload image to EC2
+      run: |
+        scp image.tar ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/
+
+    - name: 🐳 Load and run container in EC2
+      run: |
+        ssh ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
+          docker load -i image.tar
+          docker run --rm my-playwright-tests
+        EOF
