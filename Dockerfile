@@ -10,6 +10,9 @@ COPY . .
 # Instalar dependencias
 RUN npm install
 
+# Asegurar permisos de ejecución en todo el directorio
+RUN chmod -R +x /app
+
 # Comando para correr tests
 CMD ["npx", "playwright", "test"]
 

@@ -33,7 +33,7 @@ jobs:
 
     - name: 🐳 Load and run container in EC2
       run: |
-        ssh ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
-          docker load -i image.tar
+        ssh -tt ec2-user@${{ secrets.EC2_HOST }} "
+          docker load -i image.tar &&
           docker run --rm my-playwright-tests
-        EOF
+        "
