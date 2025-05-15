@@ -1,6 +1,11 @@
 # Imagen base con Node y Playwright
 FROM mcr.microsoft.com/playwright:v1.52.0-jammy
 
+# Install Allure CLI dependencies
+RUN apt-get update && \
+    apt-get install -y openjdk-11-jre && \
+    npm install -g allure-commandline http-server
+
 # Crear directorio de trabajo
 WORKDIR /app
 
@@ -10,12 +15,9 @@ COPY . .
 # Instalar dependencias
 RUN npm install
 
-# Instalar servidor HTTP para servir el reporte
-RUN npm install -g http-server
-
 # Asegurar permisos de ejecución en todo el directorio
 RUN chmod -R +x /app
 
-# Comando: corre tests y luego sirve el reporte
-CMD ["sh", "-c", "npx playwright test && http-server /app/playwright-report -p 8080"]
+# Default command does nothing now — we’ll override it on run
+CMD ["sh"]
 

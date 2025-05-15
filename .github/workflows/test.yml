@@ -36,5 +36,14 @@ jobs:
         ssh -tt ec2-user@${{ secrets.EC2_HOST }} "
           docker load -i image.tar &&
           docker rm -f playwright-container || true &&
-          docker run -d --name playwright-container -p 8080:8080 my-playwright-tests
+          docker run -d \
+            --name playwright-container \
+            -p 8080:8080 \
+            my-playwright-tests \
+            sh -c '
+              set -e &&
+              npx playwright test &&
+              allure generate allure-results --clean -o allure-report &&
+              http-server allure-report -p 8080
+            '
         "
