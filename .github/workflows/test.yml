@@ -35,5 +35,6 @@ jobs:
       run: |
         ssh -tt ec2-user@${{ secrets.EC2_HOST }} "
           docker load -i image.tar &&
-          docker run --rm my-playwright-tests
+          docker rm -f playwright-container || true &&
+          docker run -d --name playwright-container -p 8080:8080 my-playwright-tests
         "

@@ -10,9 +10,12 @@ COPY . .
 # Instalar dependencias
 RUN npm install
 
+# Instalar servidor HTTP para servir el reporte
+RUN npm install -g http-server
+
 # Asegurar permisos de ejecución en todo el directorio
 RUN chmod -R +x /app
 
-# Comando para correr tests
-CMD ["npx", "playwright", "test"]
+# Comando: corre tests y luego sirve el reporte
+CMD ["sh", "-c", "npx playwright test && http-server /app/playwright-report -p 8080"]
 
